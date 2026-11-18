@@ -10,16 +10,26 @@ export class ApiError extends Error {
   }
 }
 
-// A API responde erros como { mesagem, status } (sic); aceitamos outras grafias por segurança.
+// Formato oficial de erro: { message, status }. `mesagem` (grafia antiga) e as demais ficam só como fallback.
 function extrairMensagem(d: unknown): string | undefined {
-  if (typeof d === 'string' && d) return d
+  if (typeof d === 'string') return d.trim() && !d.trimStart().startsWith('<') ? d : undefined // ignora páginas HTML
   if (d && typeof d === 'object') {
     const o = d as Record<string, unknown>
-    for (const k of ['mesagem', 'mensagem', 'message', 'erro', 'error']) {
-      if (typeof o[k] === 'string') return o[k] as string
+    for (const k of ['message', 'mesagem', 'mensagem', 'erro', 'error']) {
+      const v = o[k]
+      if (typeof v === 'string' && v.trim()) return v
     }
   }
   return undefined
+}
+
+// Só usado quando a API não envia mensagem alguma.
+function mensagemPadrao(status: number): string {
+  if (status === 400) return 'Requisição inválida. Revise os dados enviados.'
+  if (status === 404) return 'Recurso não encontrado.'
+  if (status === 409) return 'Conflito: o recurso já existe.'
+  if (status >= 500) return 'Erro interno do servidor. Tente novamente em instantes.'
+  return `Erro ${status} ao falar com a API.`
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -39,7 +49,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   } catch {
     corpo = texto
   }
-  if (!res.ok) throw new ApiError(extrairMensagem(corpo) ?? `Erro ${res.status} ao falar com a API.`, res.status)
+  if (!res.ok) throw new ApiError(extrairMensagem(corpo) ?? mensagemPadrao(res.status), res.status)
   return corpo as T
 }
 

@@ -138,7 +138,7 @@ export function Pager({ pagina, limite, qtd, onChange }: { pagina: number; limit
   return (
     <nav aria-label="Paginação" className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
       <span>Página {pagina} · {qtd} {qtd === 1 ? 'item' : 'itens'} (a API não informa o total)</span>
-      <div className="flex gap-2">
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
         <Button disabled={pagina <= 1} onClick={() => onChange(pagina - 1)}><ChevronLeft className="size-4" />Anterior</Button>
         <Button disabled={qtd < limite} onClick={() => onChange(pagina + 1)}>Próxima<ChevronRight className="size-4" /></Button>
       </div>

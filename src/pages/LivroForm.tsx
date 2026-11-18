@@ -4,7 +4,7 @@ import { Button, ErrorBox, Field, Loading, PageHeader, btnCls, inputCls, useToas
 import { useAsync } from '../hooks/useAsync'
 import { autorObj, errMsg } from '../lib'
 import { autoresApi, livrosApi } from '../services/api'
-import { EDITORAS, type Autor, type LivroInput } from '../types'
+import type { Autor, LivroInput } from '../types'
 
 type Estado = { titulo: string; editora: string; preco: string; paginas: string; autor: string }
 type Erros = Partial<Record<keyof Estado, string>>
@@ -15,12 +15,15 @@ const TAM_AUTORES = 50
 function validar(f: Estado): Erros {
   const e: Erros = {}
   if (!f.titulo.trim()) e.titulo = 'Informe o título.'
-  if (!(EDITORAS as readonly string[]).includes(f.editora)) e.editora = 'Escolha uma editora da lista.'
+  if (!f.editora.trim()) e.editora = 'Informe a editora.'
   if (!f.autor) e.autor = 'Escolha um autor.'
-  if (f.preco !== '' && !(Number(f.preco) >= 0)) e.preco = 'Informe um preço válido (0 ou mais).'
-  if (f.paginas !== '') {
+  if (f.preco.trim() !== '') {
+    const n = Number(f.preco)
+    if (!Number.isFinite(n) || n <= 0) e.preco = 'O preço deve ser um número maior que zero.'
+  }
+  if (f.paginas.trim() !== '') {
     const n = Number(f.paginas)
-    if (!Number.isInteger(n) || n < 10 || n > 1000) e.paginas = 'O número de páginas deve estar entre 10 e 1000.'
+    if (!Number.isInteger(n) || n < 10 || n > 1000) e.paginas = 'O número de páginas deve ser um inteiro entre 10 e 1000.'
   }
   return e
 }
@@ -76,9 +79,9 @@ export default function LivroForm() {
     const v = validar(f)
     setErros(v)
     if (Object.keys(v).length) return
-    const dto: LivroInput = { titulo: f.titulo.trim(), editora: f.editora, autor: f.autor } // autor = ObjectId
-    if (f.preco !== '') dto.preco = Number(f.preco)
-    if (f.paginas !== '') dto.paginas = Number(f.paginas)
+    const dto: LivroInput = { titulo: f.titulo.trim(), editora: f.editora.trim(), autor: f.autor } // autor = ObjectId
+    if (f.preco.trim() !== '') dto.preco = Number(f.preco)
+    if (f.paginas.trim() !== '') dto.paginas = Number(f.paginas)
     setSalvando(true)
     try {
       if (id) {
@@ -108,17 +111,14 @@ export default function LivroForm() {
           <input id="titulo" className={inputCls} value={f.titulo} onChange={handleCampo('titulo')} aria-invalid={Boolean(erros.titulo)} />
         </Field>
         <Field label="Editora" htmlFor="editora" error={erros.editora}>
-          <select id="editora" className={inputCls} value={f.editora} onChange={handleCampo('editora')} aria-invalid={Boolean(erros.editora)}>
-            <option value="">Selecione…</option>
-            {EDITORAS.map((e) => <option key={e} value={e}>{e}</option>)}
-          </select>
+          <input id="editora" className={inputCls} value={f.editora} onChange={handleCampo('editora')} aria-invalid={Boolean(erros.editora)} />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Preço (R$)" htmlFor="preco" error={erros.preco}>
-            <input id="preco" type="number" min="0" step="0.01" className={inputCls} value={f.preco} onChange={handleCampo('preco')} aria-invalid={Boolean(erros.preco)} />
+            <input id="preco" type="number" min="0.01" step="0.01" className={inputCls} value={f.preco} onChange={handleCampo('preco')} aria-invalid={Boolean(erros.preco)} />
           </Field>
           <Field label="Páginas" htmlFor="paginas" error={erros.paginas} hint="Entre 10 e 1000.">
-            <input id="paginas" type="number" step="1" className={inputCls} value={f.paginas} onChange={handleCampo('paginas')} aria-invalid={Boolean(erros.paginas)} />
+            <input id="paginas" type="number" min="10" max="1000" step="1" className={inputCls} value={f.paginas} onChange={handleCampo('paginas')} aria-invalid={Boolean(erros.paginas)} />
           </Field>
         </div>
         <Field label="Autor" htmlFor="autor" error={erros.autor}>

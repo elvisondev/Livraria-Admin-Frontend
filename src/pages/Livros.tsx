@@ -85,16 +85,20 @@ export default function Livros() {
         <Field label="Preço mínimo" htmlFor="f-min"><input id="f-min" type="number" min="0" step="0.01" className={inputCls} value={form.precoMin} onChange={handleCampo('precoMin')} /></Field>
         <Field label="Preço máximo" htmlFor="f-max"><input id="f-max" type="number" min="0" step="0.01" className={inputCls} value={form.precoMax} onChange={handleCampo('precoMax')} /></Field>
         <div className="flex flex-wrap items-end gap-3 sm:col-span-2 lg:col-span-5">
-          <Button type="submit" variant="primary"><Search className="size-4" />Aplicar filtros</Button>
-          <Button onClick={handleLimpar} disabled={!ativo && !Object.values(form).some(Boolean)}><X className="size-4" />Limpar filtros</Button>
-          <div className="w-44"><Field label="Ordenar por" htmlFor="o-ord">
-            <select id="o-ord" className={inputCls} value={ordenacao} onChange={(e) => atualizar({ ordenacao: e.target.value, paginas: undefined })}>
-              {ORDENS.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
-            </select></Field></div>
-          <div className="w-32"><Field label="Por página" htmlFor="o-lim">
-            <select id="o-lim" className={inputCls} value={limite} onChange={(e) => atualizar({ limite: e.target.value, paginas: undefined })}>
-              {LIMITES.map((n) => <option key={n} value={n}>{n}</option>)}
-            </select></Field></div>
+          <div className="flex w-full flex-col gap-2 sm:contents">
+            <Button type="submit" variant="primary"><Search className="size-4" />Aplicar filtros</Button>
+            <Button onClick={handleLimpar} disabled={!ativo && !Object.values(form).some(Boolean)}><X className="size-4" />Limpar filtros</Button>
+          </div>
+          <div className="grid w-full grid-cols-2 gap-3 sm:contents">
+            <div className="min-w-0 sm:w-44"><Field label="Ordenar por" htmlFor="o-ord">
+              <select id="o-ord" className={inputCls} value={ordenacao} onChange={(e) => atualizar({ ordenacao: e.target.value, paginas: undefined })}>
+                {ORDENS.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
+              </select></Field></div>
+            <div className="min-w-0 sm:w-32"><Field label="Por página" htmlFor="o-lim">
+              <select id="o-lim" className={inputCls} value={limite} onChange={(e) => atualizar({ limite: e.target.value, paginas: undefined })}>
+                {LIMITES.map((n) => <option key={n} value={n}>{n}</option>)}
+              </select></Field></div>
+          </div>
         </div>
         {formErro && <p role="alert" className="text-sm text-danger sm:col-span-2 lg:col-span-5">{formErro}</p>}
         <p className="text-xs text-muted sm:col-span-2 lg:col-span-5">
@@ -111,7 +115,7 @@ export default function Livros() {
       )}
       {data && data.length > 0 && (
         <>
-          <div className={`overflow-x-auto rounded-xl border border-border bg-surface ${loading ? 'opacity-60' : ''}`}>
+          <div className={`hidden overflow-x-auto rounded-xl border border-border bg-surface md:block ${loading ? 'opacity-60' : ''}`}>
             <table className="w-full min-w-[44rem] text-left text-sm">
               <thead className="border-b border-border text-muted">
                 <tr>{['Título', 'Editora', 'Preço', 'Páginas', 'Autor'].map((h) => <th key={h} scope="col" className="p-3 font-medium">{h}</th>)}<th scope="col" className="p-3 text-right font-medium">Ações</th></tr>
@@ -134,6 +138,24 @@ export default function Livros() {
               </tbody>
             </table>
           </div>
+          <ul className={`space-y-3 md:hidden ${loading ? 'opacity-60' : ''}`}>
+            {data.map((l) => (
+              <li key={l._id} className="rounded-xl border border-border bg-surface p-4">
+                <Link to={`/livros/${l._id}`} className="block break-words font-medium hover:text-primary">{l.titulo}</Link>
+                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                  <div className="min-w-0"><dt className="text-muted">Editora</dt><dd className="break-words">{l.editora}</dd></div>
+                  <div className="min-w-0"><dt className="text-muted">Autor</dt><dd className="break-words">{autorObj(l.autor)?.nome ?? <span className="text-muted">Autor removido</span>}</dd></div>
+                  <div><dt className="text-muted">Preço</dt><dd className="font-mono">{fmtPreco(l.preco)}</dd></div>
+                  <div><dt className="text-muted">Páginas</dt><dd className="font-mono">{l.paginas ?? '—'}</dd></div>
+                </dl>
+                <div className="mt-3 flex justify-end gap-1 border-t border-border pt-2">
+                  <Link to={`/livros/${l._id}`} className={iconBtn} aria-label={`Ver ${l.titulo}`}><Eye className="size-5" /></Link>
+                  <Link to={`/livros/${l._id}/editar`} className={iconBtn} aria-label={`Editar ${l.titulo}`}><Pencil className="size-5" /></Link>
+                  <button type="button" className={iconBtn} aria-label={`Excluir ${l.titulo}`} onClick={() => setApagar(l)}><Trash2 className="size-5" /></button>
+                </div>
+              </li>
+            ))}
+          </ul>
           <Pager pagina={paginas} limite={limite} qtd={data.length} onChange={(p) => atualizar({ paginas: String(p) })} />
         </>
       )}

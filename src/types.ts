@@ -1,13 +1,3 @@
-// Editoras aceitas pelo enum do model Livros.js da API.
-export const EDITORAS = [
-  'Rocco',
-  'Editora Horizonte',
-  'Editora Tecnologia',
-  'Editora Código',
-  'Editora Backend',
-  'Alta Books',
-] as const
-
 export type AutorRef = { _id: string; nome: string; nacionalidade?: string }
 export type Autor = AutorRef
 

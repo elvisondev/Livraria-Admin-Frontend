@@ -97,7 +97,7 @@ export default function Autores() {
       )}
       {data && data.length > 0 && (
         <>
-          <div className={`overflow-x-auto rounded-xl border border-border bg-surface ${loading ? 'opacity-60' : ''}`}>
+          <div className={`hidden overflow-x-auto rounded-xl border border-border bg-surface md:block ${loading ? 'opacity-60' : ''}`}>
             <table className="w-full min-w-[32rem] text-left text-sm">
               <thead className="border-b border-border text-muted">
                 <tr><th scope="col" className="p-3 font-medium">Nome</th><th scope="col" className="p-3 font-medium">Nacionalidade</th><th scope="col" className="p-3 text-right font-medium">Ações</th></tr>
@@ -117,13 +117,29 @@ export default function Autores() {
               </tbody>
             </table>
           </div>
+          <ul className={`space-y-3 md:hidden ${loading ? 'opacity-60' : ''}`}>
+            {data.map((a) => (
+              <li key={a._id} className="rounded-xl border border-border bg-surface p-4">
+                <p className="break-words font-medium">{a.nome}</p>
+                <dl className="mt-3 text-sm">
+                  <dt className="text-muted">Nacionalidade</dt>
+                  <dd className="break-words">{a.nacionalidade ?? '—'}</dd>
+                </dl>
+                <div className="mt-3 flex justify-end gap-1 border-t border-border pt-2">
+                  <button type="button" className={iconBtn} aria-label={`Ver ${a.nome}`} onClick={() => setModo({ tipo: 'ver', id: a._id })}><Eye className="size-5" /></button>
+                  <button type="button" className={iconBtn} aria-label={`Editar ${a.nome}`} onClick={() => setModo({ tipo: 'editar', id: a._id })}><Pencil className="size-5" /></button>
+                  <button type="button" className={iconBtn} aria-label={`Excluir ${a.nome}`} onClick={() => setApagar(a)}><Trash2 className="size-5" /></button>
+                </div>
+              </li>
+            ))}
+          </ul>
           <Pager pagina={paginas} limite={limite} qtd={data.length} onChange={irParaPagina} />
         </>
       )}
       {modo && <AutorDialog modo={modo} onMudar={setModo} onClose={() => setModo(null)} onSaved={handleSaved} />}
       {apagar && (
         <ConfirmDialog title="Excluir autor" confirmLabel="Excluir autor" busy={apagando} onCancel={() => setApagar(null)} onConfirm={handleExcluir}
-          message={<>Excluir <strong className="text-text">{apagar.nome}</strong>? A API não impede a exclusão de autores com livros vinculados: esses livros ficarão sem autor.</>} />
+          message={<>Excluir o autor <strong className="text-text">{apagar.nome}</strong>? Livros vinculados a este autor podem ser afetados. Essa ação não pode ser desfeita.</>} />
       )}
     </div>
   )
