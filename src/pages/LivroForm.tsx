@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, ErrorBox, Field, Loading, PageHeader, btnCls, inputCls, useToast } from '../components/ui'
 import { useAsync } from '../hooks/useAsync'
 import { autorObj, errMsg } from '../lib'
-import { autoresApi, livrosApi } from '../services/api'
+import { autoresApi, editorasExistentes, livrosApi } from '../services/api'
 import type { Autor, LivroInput } from '../types'
 
 type Estado = { titulo: string; editora: string; preco: string; paginas: string; autor: string }
@@ -43,6 +43,9 @@ export default function LivroForm() {
   const [erroAut, setErroAut] = useState('')
 
   const livro = useAsync(async () => (id ? livrosApi.obter(id) : null), [id])
+  // Sugestões opcionais: se a busca falhar, o campo segue como texto livre.
+  const [sugestoes, setSugestoes] = useState<string[]>([])
+  useEffect(() => { editorasExistentes().then(setSugestoes).catch(() => undefined) }, [])
 
   const carregarAutores = async () => {
     const proxima = pagAutores + 1
@@ -108,17 +111,18 @@ export default function LivroForm() {
       <PageHeader title={id ? 'Editar livro' : 'Novo livro'} />
       <form onSubmit={handleSubmit} noValidate className="space-y-4 rounded-xl border border-border bg-surface p-5">
         <Field label="Título" htmlFor="titulo" error={erros.titulo}>
-          <input id="titulo" className={inputCls} value={f.titulo} onChange={handleCampo('titulo')} aria-invalid={Boolean(erros.titulo)} />
+          <input id="titulo" placeholder="Ex.: Entendendo Algoritmos" className={inputCls} value={f.titulo} onChange={handleCampo('titulo')} aria-invalid={Boolean(erros.titulo)} />
         </Field>
         <Field label="Editora" htmlFor="editora" error={erros.editora}>
-          <input id="editora" className={inputCls} value={f.editora} onChange={handleCampo('editora')} aria-invalid={Boolean(erros.editora)} />
+          <input id="editora" list="editoras-sugeridas" autoComplete="off" placeholder="Ex.: Novatec" className={inputCls} value={f.editora} onChange={handleCampo('editora')} aria-invalid={Boolean(erros.editora)} />
+          <datalist id="editoras-sugeridas">{sugestoes.map((e) => <option key={e} value={e} />)}</datalist>
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Preço (R$)" htmlFor="preco" error={erros.preco}>
-            <input id="preco" type="number" min="0.01" step="0.01" className={inputCls} value={f.preco} onChange={handleCampo('preco')} aria-invalid={Boolean(erros.preco)} />
+            <input id="preco" placeholder="Ex.: 59,90" type="number" min="0.01" step="0.01" className={inputCls} value={f.preco} onChange={handleCampo('preco')} aria-invalid={Boolean(erros.preco)} />
           </Field>
           <Field label="Páginas" htmlFor="paginas" error={erros.paginas} hint="Entre 10 e 1000.">
-            <input id="paginas" type="number" min="10" max="1000" step="1" className={inputCls} value={f.paginas} onChange={handleCampo('paginas')} aria-invalid={Boolean(erros.paginas)} />
+            <input id="paginas" placeholder="Ex.: 256" type="number" min="10" max="1000" step="1" className={inputCls} value={f.paginas} onChange={handleCampo('paginas')} aria-invalid={Boolean(erros.paginas)} />
           </Field>
         </div>
         <Field label="Autor" htmlFor="autor" error={erros.autor}>

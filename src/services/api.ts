@@ -91,3 +91,17 @@ export async function contar(buscarPagina: (p: PageParams) => Promise<unknown[]>
   }
   return { total, exato: false }
 }
+
+// Sugestões do campo Editora: valores distintos já usados nos livros (sem endpoint novo; usa GET /livros).
+export async function editorasExistentes(tamanho = 100, maxPaginas = 5): Promise<string[]> {
+  const set = new Map<string, string>()
+  for (let paginas = 1; paginas <= maxPaginas; paginas++) {
+    const r = await livrosApi.listar({ limite: tamanho, paginas, ordenacao: 'editora:1' })
+    for (const l of r) {
+      const e = typeof l.editora === 'string' ? l.editora.trim() : ''
+      if (e && !set.has(e.toLowerCase())) set.set(e.toLowerCase(), e)
+    }
+    if (r.length < tamanho) break
+  }
+  return [...set.values()].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+}

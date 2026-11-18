@@ -42,8 +42,8 @@ function AutorDialog({ modo, onMudar, onClose, onSaved }: { modo: Modo; onMudar:
     <Modal title={titulo} onClose={onClose}>
       {id && detalhe.loading && !detalhe.data ? <Loading /> : detalhe.error ? <ErrorBox message={detalhe.error} onRetry={detalhe.reload} /> : (
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <Field label="Nome" htmlFor="a-nome"><input id="a-nome" className={inputCls} value={nome} readOnly={somenteLeitura} onChange={(e) => setNome(e.target.value)} /></Field>
-          <Field label="Nacionalidade" htmlFor="a-nac"><input id="a-nac" className={inputCls} value={nacionalidade} readOnly={somenteLeitura} placeholder={somenteLeitura ? '—' : ''} onChange={(e) => setNacionalidade(e.target.value)} /></Field>
+          <Field label="Nome" htmlFor="a-nome"><input id="a-nome" className={inputCls} value={nome} readOnly={somenteLeitura} placeholder={somenteLeitura ? undefined : 'Ex.: Robert C. Martin'} onChange={(e) => setNome(e.target.value)} /></Field>
+          <Field label="Nacionalidade" htmlFor="a-nac"><input id="a-nac" className={inputCls} value={nacionalidade} readOnly={somenteLeitura} placeholder={somenteLeitura ? '—' : 'Ex.: Brasileira'} onChange={(e) => setNacionalidade(e.target.value)} /></Field>
           {erro && <ErrorBox message={erro} />}
           <div className="flex justify-end gap-2">
             <Button onClick={onClose}>{somenteLeitura ? 'Fechar' : 'Cancelar'}</Button>
