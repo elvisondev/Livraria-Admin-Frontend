@@ -1,5 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ComboboxTexto } from '../components/ComboboxTexto'
 import { Button, ErrorBox, Field, Loading, PageHeader, btnCls, inputCls, useToast } from '../components/ui'
 import { useAsync } from '../hooks/useAsync'
 import { autorObj, errMsg } from '../lib'
@@ -114,8 +115,7 @@ export default function LivroForm() {
           <input id="titulo" placeholder="Ex.: Entendendo Algoritmos" className={inputCls} value={f.titulo} onChange={handleCampo('titulo')} aria-invalid={Boolean(erros.titulo)} />
         </Field>
         <Field label="Editora" htmlFor="editora" error={erros.editora}>
-          <input id="editora" list="editoras-sugeridas" autoComplete="off" placeholder="Ex.: Novatec" className={inputCls} value={f.editora} onChange={handleCampo('editora')} aria-invalid={Boolean(erros.editora)} />
-          <datalist id="editoras-sugeridas">{sugestoes.map((e) => <option key={e} value={e} />)}</datalist>
+          <ComboboxTexto id="editora" placeholder="Ex.: Novatec" value={f.editora} onChange={(v) => setF((x) => ({ ...x, editora: v }))} sugestoes={sugestoes} aria-invalid={Boolean(erros.editora)} />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Preço (R$)" htmlFor="preco" error={erros.preco}>

@@ -79,11 +79,11 @@ export default function Livros() {
       </PageHeader>
 
       <form onSubmit={handleAplicar} noValidate className="grid gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Field label="Título" htmlFor="f-titulo"><input id="f-titulo" className={inputCls} value={form.titulo} onChange={handleCampo('titulo')} /></Field>
-        <Field label="Editora" htmlFor="f-editora"><input id="f-editora" className={inputCls} value={form.editora} onChange={handleCampo('editora')} /></Field>
-        <Field label="Autor" htmlFor="f-autores"><input id="f-autores" className={inputCls} value={form.autores} onChange={handleCampo('autores')} /></Field>
-        <Field label="Preço mínimo" htmlFor="f-min"><input id="f-min" type="number" min="0" step="0.01" className={inputCls} value={form.precoMin} onChange={handleCampo('precoMin')} /></Field>
-        <Field label="Preço máximo" htmlFor="f-max"><input id="f-max" type="number" min="0" step="0.01" className={inputCls} value={form.precoMax} onChange={handleCampo('precoMax')} /></Field>
+        <Field label="Título" htmlFor="f-titulo"><input id="f-titulo" placeholder="Ex.: Algoritmos" className={inputCls} value={form.titulo} onChange={handleCampo('titulo')} /></Field>
+        <Field label="Editora" htmlFor="f-editora"><input id="f-editora" placeholder="Ex.: Novatec" className={inputCls} value={form.editora} onChange={handleCampo('editora')} /></Field>
+        <Field label="Autor" htmlFor="f-autores"><input id="f-autores" placeholder="Ex.: Robert C. Martin" className={inputCls} value={form.autores} onChange={handleCampo('autores')} /></Field>
+        <Field label="Preço mínimo" htmlFor="f-min"><input id="f-min" placeholder="Ex.: 20,00" type="number" min="0" step="0.01" className={inputCls} value={form.precoMin} onChange={handleCampo('precoMin')} /></Field>
+        <Field label="Preço máximo" htmlFor="f-max"><input id="f-max" placeholder="Ex.: 150,00" type="number" min="0" step="0.01" className={inputCls} value={form.precoMax} onChange={handleCampo('precoMax')} /></Field>
         <div className="flex flex-wrap items-end gap-3 sm:col-span-2 lg:col-span-5">
           <div className="flex w-full flex-col gap-2 sm:contents">
             <Button type="submit" variant="primary"><Search className="size-4" />Aplicar filtros</Button>
